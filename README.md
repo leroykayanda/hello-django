@@ -295,6 +295,32 @@ We start celery using this cmd
 
     celery -A blog worker --loglevel=info
 
+Complete docker-compose
+
+    version: '3'
+    
+    services:
+      web:
+        build: .
+        command: gunicorn --bind 0.0.0.0:8000 --log-level info --workers 4 blog.wsgi:application
+        ports:
+          - "8000:8000"
+          
+      redis:
+        image: redis:latest
+        ports:
+          - "6379:6379"
+    
+      rabbitmq:
+        image: rabbitmq:3-management
+        ports:
+          - "5672:5672"  # AMQP protocol port
+          - "15672:15672"  # Management UI
+    
+      celery:
+        build: .
+        command: celery -A blog worker --loglevel=info
+
 **Refs**
 - https://www.geeksforgeeks.org/getting-started-with-django/
 - https://www.geeksforgeeks.org/celery-integration-with-django/
