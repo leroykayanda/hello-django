@@ -6,6 +6,12 @@ services:
     command: gunicorn --bind 0.0.0.0:8000 --log-level info --workers 4 blog.wsgi:application
     ports:
       - "8000:8000"
+    environment:
+      DB_PORT: 5432
+      DB_PASSWORD: secret
+      DB_NAME: recon
+      DB_USER: recon
+      DB_ENDPOINT: postgres
       
   redis:
     image: redis:latest
@@ -21,3 +27,18 @@ services:
   celery:
     build: .
     command: celery -A blog worker --loglevel=info
+
+  postgres:
+    image: postgres:16.0
+    environment:
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: recon
+      POSTGRES_USER: recon
+      MYSQL_PASSWORD: secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
