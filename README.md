@@ -196,8 +196,53 @@ version: '3'
         command: gunicorn --bind 0.0.0.0:8000 --log-level info --workers 4 blog.wsgi:application
         ports:
           - "8000:8000"
-     
 
+## Whitenoise
+
+We use whitenoise to serve static files. Add this to the Dockerfile after collect static.
+
+    RUN  pip  install  whitenoise==6.7.0
+
+Add this in settings
+
+    STATICFILES_STORAGE  =  'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+Add this in middleware after SecurityMiddleware.
+
+    MIDDLEWARE = [
+        'django.middleware.security.SecurityMiddleware',
+        'whitenoise.middleware.WhiteNoiseMiddleware',
+    ]
+
+## Miscellaneous
+settings.py
+
+    ALLOWED_HOSTS = ["*"]
+    CSRF_TRUSTED_ORIGINS = ['https://example.com']
+
+requirements.txt
+
+    gunicorn==23.0.0
+    Django==5.1.1
+    psycopg2-binary==2.9.9
+
+## Connecting a postgres database
+
+Install `psycopg2-binary==2.9.9`
+
+settings.py
+
+    DATABASES = {
+        'default': {
+           'ENGINE': 'django.db.backends.postgresql',
+           'NAME': os.getenv("DB_NAME"),
+           'USER': os.getenv("DB_USER"),
+           'PASSWORD': os.getenv("DB_PASSWORD"),
+           'HOST': os.getenv("DB_ENDPOINT"),
+           'PORT': os.getenv("DB_PORT"),
+        }
+    }
+    
 ## Celery
 Add blog/celery.py
 
